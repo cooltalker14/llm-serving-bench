@@ -1,4 +1,4 @@
-cd ~E:\University\Research\Projects\llm-serving-bench
+cd "D:\ac\ML\Project 1\llm-serving-bench"
 cat >> .gitignore <<'EOF'
 venvs/
 .venv/
