@@ -1,0 +1,145 @@
+{
+  "tag": "fp16-smoke",
+  "config": {
+    "server": {
+      "base_url": "http://127.0.0.1:8000",
+      "model": "Qwen/Qwen2.5-0.5B-Instruct"
+    },
+    "workload": {
+      "n_prompts": 32,
+      "prompt_tokens": 256,
+      "max_tokens": 128,
+      "seed": 0
+    },
+    "sweep": {
+      "concurrency": [
+        1,
+        2,
+        4,
+        8,
+        16
+      ],
+      "requests_per_worker": 4,
+      "min_requests": 16,
+      "warmup": 4
+    }
+  },
+  "env": {
+    "timestamp_utc": "2026-08-24T12:35:44.943032+00:00",
+    "hostname": "ng10707",
+    "python": "3.11.5",
+    "platform": "Linux-5.14.0-687.38.1.el9_8.x86_64-x86_64-AMD_EPYC_7413_24-Core_Processor-with-glibc2.37",
+    "gpu": "NVIDIA A100-SXM4-40GB, 40960 MiB, 580.159.04",
+    "cuda": "Build cuda_12.2.r12.2/compiler.33191640_0",
+    "vllm": "0.25.0",
+    "torch": "2.11.0",
+    "slurm_job_id": "1600591"
+  },
+  "rows": [
+    {
+      "concurrency": 1,
+      "n_ok": 0,
+      "n_failed": 16,
+      "duration_s": 0.01,
+      "output_tok_per_s": 0.0,
+      "total_tok_per_s": 0.0,
+      "req_per_s": 0.0,
+      "ttft_p50_ms": 0.0,
+      "ttft_p90_ms": 0.0,
+      "ttft_p99_ms": 0.0,
+      "itl_p50_ms": 0.0,
+      "itl_p90_ms": 0.0,
+      "itl_p99_ms": 0.0,
+      "e2e_p50_s": 0.0,
+      "e2e_p90_s": 0.0,
+      "mean_output_tokens": 0.0,
+      "errors": [
+        "HTTP 404: {\"error\":{\"message\":\"The model `Qwen/Qwen2.5-0.5B-Instruct` does not exist.\",\"type\":\"NotFoundError\",\"param\":\"model\",\"code\":404}}"
+      ]
+    },
+    {
+      "concurrency": 2,
+      "n_ok": 0,
+      "n_failed": 16,
+      "duration_s": 0.01,
+      "output_tok_per_s": 0.0,
+      "total_tok_per_s": 0.0,
+      "req_per_s": 0.0,
+      "ttft_p50_ms": 0.0,
+      "ttft_p90_ms": 0.0,
+      "ttft_p99_ms": 0.0,
+      "itl_p50_ms": 0.0,
+      "itl_p90_ms": 0.0,
+      "itl_p99_ms": 0.0,
+      "e2e_p50_s": 0.0,
+      "e2e_p90_s": 0.0,
+      "mean_output_tokens": 0.0,
+      "errors": [
+        "HTTP 404: {\"error\":{\"message\":\"The model `Qwen/Qwen2.5-0.5B-Instruct` does not exist.\",\"type\":\"NotFoundError\",\"param\":\"model\",\"code\":404}}"
+      ]
+    },
+    {
+      "concurrency": 4,
+      "n_ok": 0,
+      "n_failed": 16,
+      "duration_s": 0.01,
+      "output_tok_per_s": 0.0,
+      "total_tok_per_s": 0.0,
+      "req_per_s": 0.0,
+      "ttft_p50_ms": 0.0,
+      "ttft_p90_ms": 0.0,
+      "ttft_p99_ms": 0.0,
+      "itl_p50_ms": 0.0,
+      "itl_p90_ms": 0.0,
+      "itl_p99_ms": 0.0,
+      "e2e_p50_s": 0.0,
+      "e2e_p90_s": 0.0,
+      "mean_output_tokens": 0.0,
+      "errors": [
+        "HTTP 404: {\"error\":{\"message\":\"The model `Qwen/Qwen2.5-0.5B-Instruct` does not exist.\",\"type\":\"NotFoundError\",\"param\":\"model\",\"code\":404}}"
+      ]
+    },
+    {
+      "concurrency": 8,
+      "n_ok": 0,
+      "n_failed": 32,
+      "duration_s": 0.02,
+      "output_tok_per_s": 0.0,
+      "total_tok_per_s": 0.0,
+      "req_per_s": 0.0,
+      "ttft_p50_ms": 0.0,
+      "ttft_p90_ms": 0.0,
+      "ttft_p99_ms": 0.0,
+      "itl_p50_ms": 0.0,
+      "itl_p90_ms": 0.0,
+      "itl_p99_ms": 0.0,
+      "e2e_p50_s": 0.0,
+      "e2e_p90_s": 0.0,
+      "mean_output_tokens": 0.0,
+      "errors": [
+        "HTTP 404: {\"error\":{\"message\":\"The model `Qwen/Qwen2.5-0.5B-Instruct` does not exist.\",\"type\":\"NotFoundError\",\"param\":\"model\",\"code\":404}}"
+      ]
+    },
+    {
+      "concurrency": 16,
+      "n_ok": 0,
+      "n_failed": 64,
+      "duration_s": 0.03,
+      "output_tok_per_s": 0.0,
+      "total_tok_per_s": 0.0,
+      "req_per_s": 0.0,
+      "ttft_p50_ms": 0.0,
+      "ttft_p90_ms": 0.0,
+      "ttft_p99_ms": 0.0,
+      "itl_p50_ms": 0.0,
+      "itl_p90_ms": 0.0,
+      "itl_p99_ms": 0.0,
+      "e2e_p50_s": 0.0,
+      "e2e_p90_s": 0.0,
+      "mean_output_tokens": 0.0,
+      "errors": [
+        "HTTP 404: {\"error\":{\"message\":\"The model `Qwen/Qwen2.5-0.5B-Instruct` does not exist.\",\"type\":\"NotFoundError\",\"param\":\"model\",\"code\":404}}"
+      ]
+    }
+  ]
+}

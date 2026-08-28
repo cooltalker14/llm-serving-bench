@@ -1,0 +1,8 @@
+cd ~E:\University\Research\Projects\llm-serving-bench
+cat >> .gitignore <<'EOF'
+venvs/
+.venv/
+logs/
+__pycache__/
+*.pyc
+EOF

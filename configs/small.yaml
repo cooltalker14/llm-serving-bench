@@ -1,0 +1,17 @@
+# Small config: runs on a single free-tier Colab T4 or a laptop against a
+# small model. This is the path a reviewer can execute in ~10 minutes.
+server:
+  base_url: "http://127.0.0.1:8000"
+  model: "qwen7b"
+
+workload:
+  n_prompts: 32
+  prompt_tokens: 256
+  max_tokens: 128
+  seed: 0
+
+sweep:
+  concurrency: [1, 2, 4, 8, 16]
+  requests_per_worker: 4
+  min_requests: 16
+  warmup: 4
