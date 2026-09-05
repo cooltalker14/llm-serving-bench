@@ -4,7 +4,7 @@ Measuring what it actually costs to serve an open-weights LLM: throughput, time-
 
 Most published LLM benchmarks report a single throughput number at an unstated batch size. That number is close to useless for capacity planning, because throughput and latency trade against each other and the answer changes with load. This repo measures the full curve for two serving configurations and finds that **the better configuration depends entirely on where on the curve you operate.**
 
-Output quality is measured separately in [llm-eval-harness](https://github.com/cooltaker14/llm-eval-harness), because a throughput win that degrades output is not a win. Results are summarised below.
+Output quality is measured separately in [llm-eval-harness](https://github.com/cooltalker14/llm-eval-harness), because a throughput win that degrades output is not a win. Results are summarised below.
 
 ---
 
