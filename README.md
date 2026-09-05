@@ -4,6 +4,8 @@ Measuring what it actually costs to serve an open-weights LLM: throughput, time-
 
 Most published LLM benchmarks report a single throughput number at an unstated batch size. That number is close to useless for capacity planning, because throughput and latency trade against each other and the answer changes with load. This repo measures the full curve for two serving configurations and finds that **the better configuration depends entirely on where on the curve you operate.**
 
+Output quality is measured separately in [llm-eval-harness](https://github.com/YOURNAME/llm-eval-harness), because a throughput win that degrades output is not a win. Results are summarised below.
+
 ---
 
 ## Headline result
@@ -48,6 +50,34 @@ This is a roofline story, and it is the reason a single-number benchmark would g
 | Saturated batch serving | **bf16** | 19% more throughput at peak, and it keeps scaling past 256 |
 
 "int4 is faster" is true for less than half of the range measured here. The right question is not which quantization is faster but *where on the load curve you actually operate.*
+
+---
+
+## Does the quantized model still produce correct output?
+
+A throughput comparison is only actionable if quality holds. Measured in the companion repo on a 40-item hand-labelled extraction task, at temperature 0, with paired statistics:
+
+| Metric | bf16 | AWQ | Delta | 95% CI | p |
+|---|---:|---:|---:|---|---:|
+| Field score (partial credit) | 0.683 | 0.700 | +0.017 | [−0.025, +0.067] | 0.438 |
+| All fields correct | 0.225 | 0.300 | +0.075 | [−0.031, +0.116] | 0.375 |
+
+Both configurations produced valid, schema-conformant JSON on 100% of items. **No measurable accuracy cost from int4** — AWQ is nominally higher, but the difference sits well inside the interval.
+
+The honest caveat, which the eval harness prints itself: with n=40 the smallest detectable difference is **0.066** at 80% power. The defensible claim is "no degradation larger than about 7 points," not "identical quality."
+
+**One real difference the accuracy numbers do not show.** AWQ produced a runaway generation on one item — four mutually contradictory JSON objects, running into the 200-token cap on a question bf16 answered in 34 tokens. bf16 hit the cap zero times. Both models emitted duplicate objects at the same 5% rate, so a flat rate looks identical; the severity does not.
+
+| Signal | bf16 | AWQ |
+|---|---:|---:|
+| Hit token cap | 0 (0.0%) | 1 (2.5%) |
+| Emitted >1 JSON object | 2 (5.0%) | 2 (5.0%) |
+| Objects contradict each other | 0 (0.0%) | 1 (2.5%) |
+| Tokens generated after first object | ~84 | ~202 |
+
+That is a production concern — unbounded latency and wasted spend on a request that was already answered — and it is invisible to every accuracy metric, since the extractor recovers the correct first object.
+
+**Full conclusion:** AWQ int4 buys 2.2x throughput at low concurrency at no measurable accuracy cost, with a 2.5% rate of runaway generation that bf16 did not exhibit. For interactive serving that is a good trade if you cap output length. For saturated batch serving, bf16 wins on throughput anyway.
 
 ---
 
@@ -142,7 +172,7 @@ python analysis/report.py results/*.json --out analysis/out
 
 Set `server.model` in the config to match `--served-model-name`.
 
-### Full run — Digital Research Alliance of Canada
+### Full run — Slurm cluster
 
 ```bash
 sbatch scripts/smoke_then_full.sh bf16
@@ -161,7 +191,6 @@ GPU       NVIDIA A100-SXM4-40GB, driver 580.159.04
 CUDA      12.2
 vLLM      0.25.0
 torch     2.11.0
-Cluster   Narval (Digital Research Alliance of Canada)
 
 bf16      Slurm job 1720692, host ng10104 (EPYC 7413, 24-core)
 AWQ       Slurm job 1731775, host ng31006 (EPYC 7543, 32-core)
@@ -179,7 +208,7 @@ src/bench/load.py      concurrency driver and percentile aggregation
 src/bench/prompts.py   deterministic fixed-length prompts
 src/bench/sweep.py     sweep CLI, environment capture
 analysis/report.py     markdown tables and tradeoff plot
-scripts/               Alliance setup, model prefetch, Slurm jobs
+scripts/               cluster setup, model prefetch, Slurm jobs
 tests/                 mock server and timing verification
 ```
 
@@ -190,5 +219,5 @@ tests/                 mock server and timing verification
 - **The two sweeps ran on different nodes** with different host CPUs (EPYC 7413 vs 7543). The GPU is identical and the load generator is async I/O rather than CPU-bound, so this is unlikely to affect the comparison meaningfully — but it is an uncontrolled variable and is disclosed rather than hidden. Pinning both runs to one node would remove it.
 - **Closed-loop load only.** N workers each send, wait, and send again. This models batch and offline workloads; open-loop Poisson arrivals would better model interactive traffic and are not implemented.
 - **Fixed prompt and output length.** Real traffic has a length distribution, which changes batching behaviour.
-- **Output quality is not measured.** AWQ generated slightly shorter completions on average (246–249 tokens vs 251–255 for bf16), which hints at distributional differences the throughput numbers cannot capture. Throughput gains from quantization mean nothing without a quality check — that belongs in a companion evaluation repo.
+- **The quality comparison uses 40 items.** Large enough to rule out a degradation of ~7 points or more, not large enough to establish equivalence. See the companion repo for the power analysis.
 - **The `results/fp16_*.json` file is bf16, not fp16.** The tag is a shorthand for "unquantized 16-bit"; the server log confirms `dtype=torch.bfloat16`.
